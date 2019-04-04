@@ -1,0 +1,1 @@
+**KIOBI - Simple tool for exporting and importing Kibana Objects**
