@@ -8,4 +8,4 @@ setup(name='kiobi',
       author_email='tomas.bellus@gmail.com',
       packages=find_packages(),
       # scripts=['path/to/executable/scripts'],
-      install_requires=['requests'])
+      install_requires=['requests', 'elasticsearch'])

@@ -27,7 +27,7 @@ def retrieve_saved_objects_by_title(host: str, pattern: str, **kwargs):
 
 def bulk_create_objects_query(host: str, objects: list):
     url = "{}/api/saved_objects/_bulk_create".format(host)
-    data = [objects]
+    data = objects
 
     return {
         "url": url,
