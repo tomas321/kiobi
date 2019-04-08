@@ -34,5 +34,4 @@ def initialize_elasticsearch(es: Elasticsearch, template: str):
         if 'error' not in res:
             log.info("Successfully created index template")
         else:
-            log.error("Failed to create index template")
-            raise ValueError(str(res))
+            raise ValueError("Failed to create index template. msg: {}".format(str(res)))

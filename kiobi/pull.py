@@ -3,7 +3,7 @@
 import argparse
 import os
 
-from kiobi.log import setup_logger
+from kiobi.log import setup_logger, log
 from kiobi.kibana_objects.pull import pull_objects, writer
 from kiobi.kibana_objects import query
 
@@ -62,14 +62,25 @@ def parse_arguments():
     return settings
 
 
-def main():
-    preferences = parse_arguments()
-    setup_logger(preferences['log_level'])
-
+def process(preferences):
     request = query.retrieve_all_saved_objects_request_uri(**preferences['query'])
     with pull_objects.ObjectPuller(request) as puller:
         data = puller.retrieve_objects()
         writer.write_objects_to_file(preferences['path'], data)
+
+
+def main():
+    preferences = parse_arguments()
+    setup_logger(preferences['log_level'])
+
+    try:
+        process(preferences)
+    except ValueError as ve:
+        log.error("Failed to pull objects with '{}': msq: '{}'".format(type(ve).__name__, ve))
+    except ConnectionError as ce:
+        log.error("Failed to connect to host. msg: '{}'".format(ce))
+    except Exception as e:
+        log.error("Unexpected error '{}'. msg: '{}'".format(type(e).__name__, e))
 
 
 if __name__ == '__main__':

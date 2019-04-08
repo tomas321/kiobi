@@ -4,8 +4,7 @@ import argparse
 import os
 
 from kiobi.log import setup_logger, log
-from kiobi.kibana_objects.push.push_objects import ObjectPusher
-import kiobi.kibana_objects.push.reader as reader
+from kiobi.kibana_objects.push import push_objects, reader
 from kiobi.kibana_objects import query
 
 
@@ -61,15 +60,26 @@ def parse_arguments():
     return settings
 
 
+def process(preferences):
+    data = reader.read_objects_file(preferences['file'])
+    request = query.bulk_create_objects_query(preferences['query']['host'], data)
+    log.debug("used request: '{}'".format(request))
+    with push_objects.ObjectPusher(request, preferences['es_host'], preferences['template']) as pusher:
+        pusher.commit_objects()
+
+
 def main():
     preferences = parse_arguments()
     setup_logger(preferences['log_level'])
 
-    data = reader.read_objects_file(preferences['file'])
-    request = query.bulk_create_objects_query(preferences['query']['host'], data)
-    log.debug("used request: '{}'".format(request))
-    with ObjectPusher(request, preferences['es_host'], preferences['template']) as pusher:
-        pusher.commit_objects()
+    try:
+        process(preferences)
+    except ValueError as ve:
+        log.error("Failed to push objects with '{}': msq: '{}'".format(type(ve).__name__, ve))
+    except ConnectionError as ce:
+        log.error("Failed to connect to host. msg: '{}'".format(ce))
+    except Exception as e:
+        log.error("Unexpected error '{}'. msg: '{}'".format(type(e).__name__, e))
 
 
 if __name__ == '__main__':
