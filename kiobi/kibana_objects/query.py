@@ -14,14 +14,14 @@ def retrieve_all_saved_objects_request_uri(host: str, per_page: int = 100, page:
 
 def retrieve_saved_objects_by_title(host: str, pattern: str, **kwargs):
     url = "{}/api/saved_objects/_find".format(host)
-    if 'type' not in kwargs:
-        types = "?type=visualization&type=search&type=index-pattern&type=dashboard"
+    if 'types' not in kwargs:
+        types = "type=visualization&type=search&type=index-pattern&type=dashboard"
     else:
-        types = "?type={}".format(kwargs['type'])
-    fields = "&search={}&search_fields=title".format(pattern)
+        types = '&'.join(["type={}".format(x) for x in kwargs['types']])
+    fields = "search={}&search_fields=title".format(pattern)
 
     return {
-        "url": "{}{}{}".format(url, types, fields)
+        "url": "{}?{}&{}".format(url, types, fields)
     }
 
 
