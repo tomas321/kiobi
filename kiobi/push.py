@@ -26,11 +26,12 @@ def parse_arguments():
                         required=False,
                         default=None,
                         dest='es_host')
-    parser.add_argument('-t', '--es_template', help='Index template file path',
-                        type=str,
+    parser.add_argument('-t', '--es_template', help="Index templates' file paths",
+                        type=set,
+                        nargs="+",
                         required=False,
                         default=None,
-                        dest='template')
+                        dest='templates')
     parser.add_argument('-l', '--log_level', help='Script log level',
                         type=str,
                         required=False,
@@ -58,7 +59,7 @@ def parse_arguments():
         },
         'resources': {
             'es_host': arguments.es_host,
-            'template_path': arguments.template,
+            'template_paths': arguments.templates,
             'proxies': {}
         },
         'log_level': arguments.log_level,
