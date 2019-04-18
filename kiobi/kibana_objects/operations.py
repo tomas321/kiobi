@@ -8,22 +8,26 @@ import os.path as os_path
 from kiobi.log import log
 
 
-def get_saved_objects(query: dict):
+def get_saved_objects(query: dict, proxies: dict = None):
     if 'data' in query and len(query.keys()) != 1:
         raise ValueError("Attempting to call GET request with data")
+    query['proxies'] = proxies
     return requests.get(**query)
 
 
-def create_objects(query: dict):
+def create_objects(query: dict, proxies: dict = None):
     if 'data' not in query and len(query.keys()) != 2:
         raise ValueError("Missing data in query: {}".format(query))
-    response = requests.post(url=query['url'], json=query['data'], headers={'kbn-xsrf': 'true'}).json()
+    response = requests.post(url=query['url'], json=query['data'], headers={'kbn-xsrf': 'true'}, proxies=proxies).json()
 
     errors = []
-    for obj in response['saved_objects']:
-        if 'error' in obj:
-            errors.append(obj)
-            log.warning("Pushing saved object failed for id '{}'".format(obj['id']))
+    if 'saved_objects' in response:
+        for obj in response['saved_objects']:
+            if 'error' in obj:
+                errors.append(obj)
+                log.warning("Pushing saved object failed for id '{}'".format(obj['id']))
+    else:
+        raise ValueError(response)
 
     return response, errors
 

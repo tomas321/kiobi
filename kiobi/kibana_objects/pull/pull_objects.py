@@ -8,8 +8,9 @@ find_api = 'api/saved_objects/_find?'
 
 
 class ObjectPuller:
-    def __init__(self, query: dict):
+    def __init__(self, query: dict, proxies: dict = None):
         self.__query = query
+        self.__proxies = proxies
 
     def __enter__(self):
         return self
@@ -18,7 +19,7 @@ class ObjectPuller:
         pass
 
     def retrieve_objects(self):
-        response = operations.get_saved_objects(self.__query).json()
+        response = operations.get_saved_objects(self.__query, self.__proxies).json()
         log.debug("Retrieved {} saved objects".format(response['total']))
         if response['total']:
             return response['saved_objects']

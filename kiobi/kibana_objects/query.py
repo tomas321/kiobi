@@ -3,12 +3,12 @@
 
 def retrieve_all_saved_objects_request_uri(host: str, per_page: int = 100, page: int = 1):
     url = "{}/api/saved_objects/_find".format(host)
-    types = "?type=visualization&type=search&type=index-pattern&type=dashboard"
-    fields = "&fields=id&fields=type&fields=title"
-    misc = "&per_page={}&page={}".format(per_page, page)
+    types = "type=visualization&type=search&type=index-pattern&type=dashboard"
+    # fields = "fields=id&fields=type&fields=title&fields=attributes"
+    misc = "per_page={}&page={}".format(per_page, page)
 
     return {
-        "url": "{}{}{}{}".format(url, types, fields, misc)
+        "url": "{}?{}&{}".format(url, types, misc)
     }
 
 
